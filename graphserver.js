@@ -95,7 +95,7 @@ function logDataContinuously() {
 
     if (previousValue !== null) {
       const diff = Math.abs(currentValue - previousValue);
-      
+
       if (diff > 2000) {
         console.log("Data: ", currentValue);
         serverIo.emit("data", currentValue);
