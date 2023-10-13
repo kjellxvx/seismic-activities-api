@@ -19,8 +19,8 @@ SocketIOclient socketIO;
 const int MOTOR = 4;  // Led in NodeMCU at pin GPIO16 (D0).
 
 // Select the IP address according to your local network
-// IPAddress serverIP(192, 168, 178, 138);
-IPAddress serverIP(172, 20, 10, 2);
+IPAddress serverIP(192, 168, 178, 138);
+// IPAddress serverIP(172, 20, 10, 2);
 uint16_t serverPort = 3002;  //8080;    //3000;
 
 void setup() {
@@ -42,8 +42,8 @@ void setup() {
     WiFi.softAPdisconnect(true);
   }
 
-  // WiFiMulti.addAP("FRITZ!WLAN Repeater 1750E", "00000000");
-  WiFiMulti.addAP("unknown", "kjellwistoff");
+  WiFiMulti.addAP("FRITZ!WLAN Repeater 1750E", "00000000");
+  // WiFiMulti.addAP("unknown", "kjellwistoff");
 
   //WiFi.disconnect();
   while (WiFiMulti.run() != WL_CONNECTED) {
