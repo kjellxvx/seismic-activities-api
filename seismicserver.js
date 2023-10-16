@@ -20,7 +20,7 @@ const savedData = {
   station: "Choose station and press submit to see data",
 };
 
-const desiredLength = 5000;
+const desiredLength = 500;
 const initialDelay = 40;
 const feedbackFactor = 0.03;
 const smoothingFactor = 0.2;
@@ -88,9 +88,10 @@ function logDataContinuously() {
 
     if (previousValue !== null) {
       const diff = Math.abs(currentValue - previousValue);
+      console.log("Data: ", currentValue);
 
       if (diff > 2000) {
-        console.log("Data: ", currentValue);
+        // console.log("Data: ", currentValue);
         serverIo.emit("data", currentValue);
       }
     }
