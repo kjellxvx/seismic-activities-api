@@ -1,11 +1,9 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Seismic Activities</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
     <script src="/socket.io/socket.io.js"></script>
     <!-- Include Chart.js library -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,11 +11,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
     <!-- Include the Chart.js Moment Adapter -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-moment"></script>
-</head>
-<body>
-    <h1>Seismic Activities</h1>
-    <canvas id="live-chart" width="800" height="200"></canvas>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  </head>
+  <body>
+
+    <div class="canvas-container">
+        <canvas id="live-chart" height="200"></canvas>
+    </div>
+
+    <div class="uicontainer">
+        <select id="stationSelect"></select>
+        <button id="submitButton">Submit</button>
+        <button id="stopButton">Stop</button>
+      </div>
+
     <!-- Include the client.js script -->
     <script src="/client.js"></script>
-</body>
+  </body>
 </html>

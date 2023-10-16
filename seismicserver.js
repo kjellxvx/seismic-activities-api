@@ -7,11 +7,18 @@ const server = http.createServer(app);
 const serverIo = require("socket.io")(server); // Initialize Socket.IO for server-side communication
 const clientIo = require("socket.io-client"); // Import socket.io-client for client-side communication
 
+let stationSocket;
+
 app.use(express.static(__dirname + "/public"));
 
 const globalData = [];
 let isLogging = false;
 let intervalId;
+
+const savedData = {
+  active: false,
+  station: "Choose station and press submit to see data",
+};
 
 const desiredLength = 5000;
 const initialDelay = 40;
@@ -20,34 +27,20 @@ const smoothingFactor = 0.2;
 
 let currentDelay = initialDelay;
 
-function rewriteJSON(x) {
-  let parameters = x.split("|");
-
-  return {
-    net: parameters[0],
-    sta: parameters[1],
-    lat: Number(parameters[2]),
-    lon: Number(parameters[3]),
-    desc: parameters[5],
-    start: parameters[6],
-    end: parameters[7],
-  };
-}
-
-async function subscribeToStation(stationId) {
-  const socket = clientIo("https://orfeus-eu.org", {
+function subscribeToStation(stationId) {
+  console.log("subscribed to station: " + stationId);
+  stationSocket = clientIo("https://orfeus-eu.org", {
     path: "/socket.io",
     transports: ["websocket", "polling"],
   });
 
-  socket.on("connect", function () {
-    console.log("Connected to Socket.IO server");
-    socket.emit("subscribe", stationId);
+  stationSocket.on("connect", function () {
+    console.log("Connected to orfeus-eu.org server");
+    stationSocket.emit("subscribe", stationId);
   });
 
-  socket.on("record", async function (data) {
+  stationSocket.on("record", async function (data) {
     const values = data.data;
-
     globalData.push(...values);
 
     if (globalData.length >= desiredLength && !isLogging) {
@@ -129,9 +122,29 @@ app.get("/", (req, res) => {
 // Socket.IO connection handling for server-side communication
 serverIo.on("connection", (socket) => {
   console.log("A user connected to the server");
-
+  socket.emit("initApp", savedData);
+  // console.log(savedData)
   socket.on("disconnect", () => {
     console.log("User disconnected from the server");
+  });
+
+  socket.on("updateServer", (data) => {
+    console.log(data);
+    if (data.active) {
+        console.log(data)
+      savedData.active = true;
+      savedData.station = data.station;
+      if (stationSocket) {
+        stationSocket.close();
+      }
+      subscribeToStation(data.station);
+    } else {
+      if (stationSocket) {
+        stationSocket.close();
+        savedData.active = false;
+        console.log("Connection to orfeus-eu.org server closed");
+      }
+    }
   });
 });
 
@@ -142,7 +155,9 @@ server.listen(3002, () => {
 
 // Your existing code...
 function init() {
-  subscribeToStation("NL.ARCN");
+  if (savedData.active) {
+    subscribeToStation(savedData.station);
+  }
 }
 
 init();

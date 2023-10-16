@@ -19,7 +19,9 @@ SocketIOclient socketIO;
 const int MOTOR = 4;  // Led in NodeMCU at pin GPIO16 (D0).
 
 // Select the IP address according to your local network
-IPAddress serverIP(192, 168, 178, 138);
+const char* serverHostname = "wistoff.de"; // Replace with the actual hostname
+// IPAddress serverIP(5, 45, 101, 44);
+// IPAddress serverIP(192, 168, 178, 138);
 // IPAddress serverIP(172, 20, 10, 2);
 uint16_t serverPort = 3002;  //8080;    //3000;
 
@@ -57,11 +59,16 @@ void setup() {
   Serial.print("WebSockets Client started @ IP address: ");
   Serial.println(WiFi.localIP());
 
-  // server address, port and URL
-  Serial.print("Connecting to WebSockets Server @ IP address: ");
-  Serial.print(serverIP);
-  Serial.print(", port: ");
-  Serial.println(serverPort);
+  IPAddress resolvedIP;
+  if (WiFi.hostByName(serverHostname, resolvedIP)) {
+    Serial.print("Resolved IP address for ");
+    Serial.print(serverHostname);
+    Serial.print(": ");
+    Serial.println(resolvedIP);
+    socketIO.begin(resolvedIP, serverPort);
+  } else {
+    Serial.println("Failed to resolve the hostname.");
+  }
 
   // setReconnectInterval to 10s, new from v2.5.1 to avoid flooding server. Default is 0.5s
   socketIO.setReconnectInterval(10000);
@@ -71,7 +78,7 @@ void setup() {
   // server address, port and URL
   // void begin(IPAddress host, uint16_t port, String url = "/socket.io/?EIO=4", String protocol = "arduino");
   // To use default EIO=4 fron v2.5.1
-  socketIO.begin(serverIP, serverPort);
+  // socketIO.begin(serverIP, serverPort);
 
   // event handler
   socketIO.onEvent(socketIOEvent);
