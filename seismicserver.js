@@ -18,6 +18,7 @@ let intervalId;
 const savedData = {
   active: false,
   station: "Choose station and press submit to see data",
+  threshold: 2000,
 };
 
 const desiredLength = 500;
@@ -90,7 +91,7 @@ function logDataContinuously() {
       const diff = Math.abs(currentValue - previousValue);
       console.log("Data: ", currentValue);
 
-      if (diff > 2000) {
+      if (diff > savedData.threshold) {
         // console.log("Data: ", currentValue);
         serverIo.emit("data", currentValue);
       }
@@ -132,9 +133,10 @@ serverIo.on("connection", (socket) => {
   socket.on("updateServer", (data) => {
     console.log(data);
     if (data.active) {
-        console.log(data)
+      console.log(data);
       savedData.active = true;
       savedData.station = data.station;
+      savedData.threshold = data.threshold;
       if (stationSocket) {
         stationSocket.close();
       }

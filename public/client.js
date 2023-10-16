@@ -11,10 +11,17 @@ document.getElementById("submitButton").addEventListener("click", function () {
   const submitButton = document.getElementById("submitButton");
   submitButton.style.display = "none";
 
+  const thresholdInput = document.getElementById("thresholdInput");
+  thresholdInput.style.display = "none";
+
   const stopButton = document.getElementById("stopButton");
   stopButton.style.display = "block";
 
-  const newData = { active: true, station: stationSelect.value };
+  const newData = {
+    active: true,
+    station: stationSelect.value,
+    threshold: thresholdInput.value,
+  };
   // Send user input to the server
   socket.emit("updateServer", newData);
 
@@ -29,6 +36,9 @@ document.getElementById("stopButton").addEventListener("click", function () {
   savedData.active = false;
   const stationSelect = document.getElementById("stationSelect");
   stationSelect.style.display = "block";
+
+  const thresholdInput = document.getElementById("thresholdInput");
+  thresholdInput.style.display = "block";
 
   const submitButton = document.getElementById("submitButton");
   submitButton.style.display = "block";
@@ -54,16 +64,20 @@ socket.on("initApp", (savedData) => {
   const stationSelect = document.getElementById("stationSelect");
   const submitButton = document.getElementById("submitButton");
   const stopButton = document.getElementById("stopButton");
+  const thresholdInput = document.getElementById("thresholdInput");
+  thresholdInput.value = savedData.threshold;
 
   console.log(`Received data from the server: ${savedData}`);
 
   if (savedData.active) {
     stationSelect.style.display = "none";
     submitButton.style.display = "none";
+    thresholdInput.style.display = "none";
     stopButton.style.display = "block";
   } else {
     stationSelect.style.display = "block";
     submitButton.style.display = "block";
+    thresholdInput.style.display = "block";
     stopButton.style.display = "none";
   }
 
@@ -165,6 +179,7 @@ socket.on("data", (data) => {
   console.log("Received data:", data);
   console.log("Generated timestamp:", timestamp);
   batchData.push({ timestamp, data });
+  document.getElementById("dataElement").innerText = data;
   if (batchData.length >= batchSize) {
     // Update the chart with the batch of data points
     batchData.forEach((point) => {

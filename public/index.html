@@ -14,16 +14,18 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
   <body>
-
     <div class="canvas-container">
-        <canvas id="live-chart" height="200"></canvas>
+      <canvas id="live-chart" height="200"></canvas>
     </div>
-
+    <div class="dataContainer">
+      <div id="dataElement"></div>
+    </div>
     <div class="uicontainer">
-        <select id="stationSelect"></select>
-        <button id="submitButton">Submit</button>
-        <button id="stopButton">Stop</button>
-      </div>
+      <select id="stationSelect"></select>
+      <input type="number" name="" id="thresholdInput">
+      <button id="submitButton">Submit</button>
+      <button id="stopButton">Stop</button>
+    </div>
 
     <!-- Include the client.js script -->
     <script src="/client.js"></script>
