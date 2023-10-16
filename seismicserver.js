@@ -89,10 +89,9 @@ function logDataContinuously() {
 
     if (previousValue !== null) {
       const diff = Math.abs(currentValue - previousValue);
-      console.log("Data: ", currentValue);
 
       if (diff > savedData.threshold) {
-        // console.log("Data: ", currentValue);
+        console.log("Data: ", currentValue);
         serverIo.emit("data", currentValue);
       }
     }
