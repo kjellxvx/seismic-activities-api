@@ -6,7 +6,8 @@ body {
   display: flex;
   justify-content: center;
   gap: 1em;
-  padding: 5em 0 5em 0;
+  padding: 1em 0 1em 0;
+  text-align: center;
 }
 
 button {
