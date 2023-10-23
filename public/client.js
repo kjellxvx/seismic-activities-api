@@ -5,17 +5,12 @@ const ctx = document.getElementById("live-chart").getContext("2d");
 let liveChart = initializeLiveChart("");
 
 document.getElementById("submitButton").addEventListener("click", function () {
-  const stationSelect = document.getElementById("stationSelect");
-  stationSelect.style.display = "none";
-
   const submitButton = document.getElementById("submitButton");
   submitButton.style.display = "none";
 
-  const thresholdInput = document.getElementById("thresholdInput");
-  thresholdInput.style.display = "none";
-
-  const stepsInput = document.getElementById("stepsInput");
-  stepsInput.style.display = "none";
+  document.getElementById("stationSelect").disabled = true;
+  document.getElementById("thresholdInput").disabled = true;
+  document.getElementById("stepsInput").disabled = true;
 
   const stopButton = document.getElementById("stopButton");
   stopButton.style.display = "block";
@@ -38,14 +33,12 @@ document.getElementById("submitButton").addEventListener("click", function () {
 
 document.getElementById("stopButton").addEventListener("click", function () {
   savedData.active = false;
-  const stationSelect = document.getElementById("stationSelect");
-  stationSelect.style.display = "block";
 
-  const thresholdInput = document.getElementById("thresholdInput");
-  thresholdInput.style.display = "block";
+  document.getElementById("stationSelect").disabled = false;
 
-  const stepsInput = document.getElementById("stepsInput");
-  stepsInput.style.display = "block";
+  document.getElementById("thresholdInput").disabled = false;
+
+  document.getElementById("stepsInput").disabled = false;
 
   const submitButton = document.getElementById("submitButton");
   submitButton.style.display = "block";
@@ -80,16 +73,16 @@ socket.on("initApp", (savedData) => {
   console.log(`Received data from the server: ${savedData}`);
 
   if (savedData.active) {
-    stationSelect.style.display = "none";
     submitButton.style.display = "none";
-    thresholdInput.style.display = "none";
-    stepsInput.style.display = "none";
+    stationSelect.disabled = true;
+    thresholdInput.disabled = true;
+    stepsInput.disabled = true;
     stopButton.style.display = "block";
   } else {
-    stationSelect.style.display = "block";
     submitButton.style.display = "block";
-    thresholdInput.style.display = "block";
-    stepsInput.style.display = "block";
+    stationSelect.disabled = false;
+    thresholdInput.disabled = false;
+    stepsInput.disabled = false;
     stopButton.style.display = "none";
   }
 

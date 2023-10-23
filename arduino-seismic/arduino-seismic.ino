@@ -171,7 +171,8 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
               int currentValue = data["currentValue"];
               int maxValue = data["maxValue"];
               int minValue = data["minValue"];
-              int motorValue = map(currentValue, minValue, maxValue, -5, 5);
+              int stepSize = data["stepSize"];
+              int motorValue = map(currentValue, minValue, maxValue, -stepSize, stepSize);
               Serial.println(currentValue);
               moveMotor(motorValue);
             }
