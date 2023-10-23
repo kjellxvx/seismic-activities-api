@@ -162,22 +162,24 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
         // If the JSON parsing is successful
         if (!error) {
           // Check if the JSON payload is an array
-          if (doc.is<JsonArray>()) {
-            // Extract the number from the JSON array
-            JsonArray jsonArray = doc.as<JsonArray>();
-            serializeJsonPretty(jsonArray, Serial);
-            JsonObject obj = doc.as<JsonObject>();
-            if (obj.containsKey("currentValue") && obj["currentValue"].is<int>()) {
-              int currentValue = obj["currentValue"];
-              int motorValue = map(currentValue, obj["minValue"], obj["maxValue"], -3, 3);
-              // Print the JSON object to the serial monitor
-              serializeJsonPretty(obj, Serial);
+          if (doc.is<JsonArray>() && doc.size() == 2) {
+            // Get the first element, which is a string
+            String firstElement = doc[0];
+            if (firstElement == "data") {
+              // Get the second element, which is an object
+              JsonObject data = doc[1].as<JsonObject>();
+              int currentValue = data["currentValue"];
+              int maxValue = data["maxValue"];
+              int minValue = data["minValue"];
+              int motorValue = map(currentValue, minValue, maxValue, -5, 5);
+              Serial.println(currentValue);
               moveMotor(motorValue);
             }
           }
         }
       }
       break;
+
 
     case sIOtype_ACK:
       // Serial.print("[IOc] Get ack: ");

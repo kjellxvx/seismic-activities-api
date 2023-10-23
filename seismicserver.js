@@ -19,6 +19,7 @@ const savedData = {
   active: false,
   station: "Choose station and press submit to see data",
   threshold: 2000,
+  stepSize: 5,
 };
 
 const desiredLength = 2000;
@@ -122,6 +123,7 @@ function logDataContinuously() {
           maxValue: stats.highest,
           minValue: stats.lowest,
           averageValue: stats.average,
+          stepSize: savedData.stepSize,
         };
         serverIo.emit("data", data);
       }
@@ -167,6 +169,7 @@ serverIo.on("connection", (socket) => {
       savedData.active = true;
       savedData.station = data.station;
       savedData.threshold = data.threshold;
+      savedData.stepSize = data.stepSize;
       if (stationSocket) {
         stationSocket.close();
       }

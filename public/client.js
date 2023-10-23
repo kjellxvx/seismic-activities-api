@@ -14,6 +14,9 @@ document.getElementById("submitButton").addEventListener("click", function () {
   const thresholdInput = document.getElementById("thresholdInput");
   thresholdInput.style.display = "none";
 
+  const stepsInput = document.getElementById("stepsInput");
+  stepsInput.style.display = "none";
+
   const stopButton = document.getElementById("stopButton");
   stopButton.style.display = "block";
 
@@ -21,6 +24,7 @@ document.getElementById("submitButton").addEventListener("click", function () {
     active: true,
     station: stationSelect.value,
     threshold: thresholdInput.value,
+    stepSize: stepsInput.value,
   };
   // Send user input to the server
   socket.emit("updateServer", newData);
@@ -39,6 +43,9 @@ document.getElementById("stopButton").addEventListener("click", function () {
 
   const thresholdInput = document.getElementById("thresholdInput");
   thresholdInput.style.display = "block";
+
+  const stepsInput = document.getElementById("stepsInput");
+  stepsInput.style.display = "block";
 
   const submitButton = document.getElementById("submitButton");
   submitButton.style.display = "block";
@@ -67,17 +74,22 @@ socket.on("initApp", (savedData) => {
   const thresholdInput = document.getElementById("thresholdInput");
   thresholdInput.value = savedData.threshold;
 
+  const stepsInput = document.getElementById("stepsInput");
+  stepsInput.value = savedData.stepSize;
+
   console.log(`Received data from the server: ${savedData}`);
 
   if (savedData.active) {
     stationSelect.style.display = "none";
     submitButton.style.display = "none";
     thresholdInput.style.display = "none";
+    stepsInput.style.display = "none";
     stopButton.style.display = "block";
   } else {
     stationSelect.style.display = "block";
     submitButton.style.display = "block";
     thresholdInput.style.display = "block";
+    stepsInput.style.display = "block";
     stopButton.style.display = "none";
   }
 
