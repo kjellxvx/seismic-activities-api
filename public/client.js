@@ -172,14 +172,20 @@ function generateTimestamp() {
 }
 
 let batchData = []; // Store data points in a batch
-const batchSize = 5; // Update the chart every 5 data points
+const batchSize = 10; // Update the chart every 5 data points
 
 socket.on("data", (data) => {
   const timestamp = generateTimestamp(); // Generate a timestamp for this data point
   console.log("Received data:", data);
   console.log("Generated timestamp:", timestamp);
-  batchData.push({ timestamp, data });
-  document.getElementById("dataElement").innerText = data;
+  const currentValue = data.currentValue;
+  batchData.push({ timestamp, currentValue });
+
+  document.getElementById("currentValue").innerText = currentValue;
+  document.getElementById("maxValue").innerText = data.maxValue;
+  document.getElementById("minValue").innerText = data.minValue;
+  document.getElementById("averageValue").innerText = data.averageValue;
+
   if (batchData.length >= batchSize) {
     // Update the chart with the batch of data points
     batchData.forEach((point) => {
@@ -187,7 +193,6 @@ socket.on("data", (data) => {
       liveChart.data.datasets[0].data.push(point.data);
     });
     if (liveChart.data.labels.length > 500) {
-      // Remove excess data points (last 100)
       const removeCount = liveChart.data.labels.length - 500;
       liveChart.data.labels.splice(0, removeCount);
       liveChart.data.datasets[0].data.splice(0, removeCount);

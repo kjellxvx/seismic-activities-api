@@ -21,7 +21,7 @@ const savedData = {
   threshold: 2000,
 };
 
-const desiredLength = 500;
+const desiredLength = 2000;
 const initialDelay = 40;
 const feedbackFactor = 0.03;
 const smoothingFactor = 0.2;
@@ -43,6 +43,7 @@ function subscribeToStation(stationId) {
   stationSocket.on("record", async function (data) {
     const values = data.data;
     globalData.push(...values);
+    console.log(globalData.length + " / " + desiredLength);
 
     if (globalData.length >= desiredLength && !isLogging) {
       isLogging = true;
@@ -51,6 +52,25 @@ function subscribeToStation(stationId) {
 
     adjustDelay();
   });
+}
+
+function calculateStats() {
+  if (globalData.length === 0) {
+    return {
+      highest: 0,
+      lowest: 0,
+      average: 0,
+    };
+  }
+  const sortedData = globalData.slice().sort((a, b) => a - b); // Create a sorted copy of the data
+  const highest = sortedData[sortedData.length - 1]; // Get the highest value
+  const lowest = sortedData[0]; // Get the lowest value
+  const average = Math.round((highest + lowest) / 2); // Calculate the value in between
+  return {
+    highest,
+    lowest,
+    average,
+  };
 }
 
 // Function to adjust the delay based on globalData length
@@ -92,7 +112,18 @@ function logDataContinuously() {
 
       if (diff > savedData.threshold) {
         console.log("Data: ", currentValue);
-        serverIo.emit("data", currentValue);
+        // Calculate and log the highest, lowest, and middle values
+        const stats = calculateStats();
+        // console.log("Highest value:", stats.highest);
+        // console.log("Lowest value:", stats.lowest);
+        // console.log("Middle value:", stats.average);
+        const data = {
+          currentValue: currentValue,
+          maxValue: stats.highest,
+          minValue: stats.lowest,
+          averageValue: stats.average,
+        };
+        serverIo.emit("data", data);
       }
     }
 

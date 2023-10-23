@@ -16,19 +16,20 @@
 
 ESP8266WiFiMulti WiFiMulti;
 SocketIOclient socketIO;
-const int MOTOR = 4;  // Led in NodeMCU at pin GPIO16 (D0).
+
+const int dirPin = 0;
+const int stepPin = 2;
 
 // Select the IP address according to your local network
-const char* serverHostname = "wistoff.de"; // Replace with the actual hostname
-// IPAddress serverIP(5, 45, 101, 44);
-// IPAddress serverIP(192, 168, 178, 138);
-// IPAddress serverIP(172, 20, 10, 2);
-uint16_t serverPort = 3002;  //8080;    //3000;
+const char* serverHostname = "wistoff.de";
+uint16_t serverPort = 3002;
 
 void setup() {
   // Serial.begin(921600);
   Serial.begin(115200);
-  pinMode(MOTOR, OUTPUT);
+
+  pinMode(stepPin, OUTPUT);
+  pinMode(dirPin, OUTPUT);
 
   while (!Serial)
     ;
@@ -119,22 +120,22 @@ void loop() {
 }
 
 void moveMotor(int number) {
-  static int oldValue = 0;       // Static variable to store the old value
-  int diff = number - oldValue;  // Calculate the difference
+  Serial.println(number);
 
-  Serial.print("Difference: ");
-  Serial.println(diff);
+  if (number > 0) {
+    digitalWrite(dirPin, HIGH);
+  } else {
+    digitalWrite(dirPin, LOW);
+  }
 
-  int value = abs(diff);
-  Serial.print("value: ");
-  Serial.println(value);
-  int motorSpeed = map(value, 0, 3000, 150, 255);
-  Serial.print("motorSpeed: ");
-  Serial.println(motorSpeed);
-  analogWrite(MOTOR, motorSpeed);
+  int posNumber = abs(number);
 
-  // Update the old value with the new value for the next call
-  oldValue = number;
+  for (int x = 0; x < posNumber; x++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(1000);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(1000);
+  }
 }
 
 void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const size_t& length) {
@@ -164,10 +165,14 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
           if (doc.is<JsonArray>()) {
             // Extract the number from the JSON array
             JsonArray jsonArray = doc.as<JsonArray>();
-            if (jsonArray.size() == 2 && jsonArray[0] == "data" && jsonArray[1].is<int>()) {
-              int number = jsonArray[1];  // Extract the number
-              // Call a function with the extracted number
-              moveMotor(number);
+            serializeJsonPretty(jsonArray, Serial);
+            JsonObject obj = doc.as<JsonObject>();
+            if (obj.containsKey("currentValue") && obj["currentValue"].is<int>()) {
+              int currentValue = obj["currentValue"];
+              int motorValue = map(currentValue, obj["minValue"], obj["maxValue"], -3, 3);
+              // Print the JSON object to the serial monitor
+              serializeJsonPretty(obj, Serial);
+              moveMotor(motorValue);
             }
           }
         }

@@ -34,3 +34,13 @@ button {
   justify-content: center;
   padding: 5em 0 0 0;
 }
+
+.statsContainer {
+  display: flex;
+  padding: 1em;
+}
+
+.stat {
+  text-align: center;
+  padding: 1em;
+}

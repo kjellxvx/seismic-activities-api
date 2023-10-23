@@ -18,11 +18,28 @@
       <canvas id="live-chart" height="200"></canvas>
     </div>
     <div class="dataContainer">
-      <div id="dataElement"></div>
+      <div class="statsContainer">
+        <div class="stat">
+          <p>Current Value</p>
+          <p id="currentValue"></p>
+        </div>
+        <div class="stat">
+          <p>Max Value</p>
+          <p id="maxValue"></p>
+        </div>
+        <div class="stat">
+          <p>Min Value</p>
+          <p id="minValue"></p>
+        </div>
+        <div class="stat">
+          <p>Average Value</p>
+          <p id="averageValue"></p>
+        </div>
+      </div>
     </div>
     <div class="uicontainer">
       <select id="stationSelect"></select>
-      <input type="number" name="" id="thresholdInput">
+      <input type="number" name="" id="thresholdInput" />
       <button id="submitButton">Submit</button>
       <button id="stopButton">Stop</button>
     </div>
