@@ -174,9 +174,9 @@ serverIo.on('connection', socket => {
       savedData.station = data.station
       savedData.threshold = data.threshold
       savedData.stepSize = data.stepSize
-      if (stationSocket) {
-        stationSocket.close()
-      }
+      // if (stationSocket) {
+      //   stationSocket.close()
+      // }
       subscribeToStation(data.station)
     } else {
       if (stationSocket) {
