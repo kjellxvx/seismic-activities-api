@@ -179,6 +179,7 @@ serverIo.on('connection', socket => {
     } else {
       if (stationSocket) {
         reset()
+        stationSocket.close()
         savedData.active = false
         console.log('Connection to orfeus-eu.org server closed')
       }
