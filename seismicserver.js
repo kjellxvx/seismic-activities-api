@@ -135,6 +135,7 @@ function logDataContinuously () {
 
 function reset () {
   globalData.length = 0;
+  isLogging = false;
 }
 
 // function logDataContinuously() {
@@ -174,14 +175,10 @@ serverIo.on('connection', socket => {
       savedData.station = data.station
       savedData.threshold = data.threshold
       savedData.stepSize = data.stepSize
-      // if (stationSocket) {
-      //   stationSocket.close()
-      // }
       subscribeToStation(data.station)
     } else {
       if (stationSocket) {
         reset()
-        stationSocket.close()
         savedData.active = false
         console.log('Connection to orfeus-eu.org server closed')
       }
