@@ -80,7 +80,7 @@ void setup() {
   }
 
   // setReconnectInterval to 10s, new from v2.5.1 to avoid flooding server. Default is 0.5s
-  socketIO.setReconnectInterval(10000);
+  socketIO.setReconnectInterval(1000);
 
   // event handler
   socketIO.onEvent(socketIOEvent);
@@ -93,7 +93,7 @@ void loop() {
 
   uint64_t now = millis();
 
-  if (now - messageTimestamp > 30000) {
+  if (now - messageTimestamp > 500) {
     messageTimestamp = now;
 
     // creat JSON message for Socket.IO (event)
@@ -127,11 +127,16 @@ void moveMotor(int number) {
 
   int posNumber = abs(number);
 
+  unsigned long previousMillis = 0;     // Variable to store the last time the stepPin was toggled
+  const unsigned long interval = 1000;  // Time in microseconds between stepPin toggles
+
   for (int x = 0; x < posNumber; x++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(1000);
+    unsigned long currentMillis = micros();  // Get the current time in microseconds
+
+    if (currentMillis - previousMillis >= interval) {
+      digitalWrite(stepPin, !digitalRead(stepPin));  // Toggle the stepPin
+      previousMillis = currentMillis;                // Save the last time the stepPin was toggled
+    }
   }
 }
 
@@ -171,11 +176,6 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
           }
         }
       }
-      break;
-
-    case sIOtype_DISCONNECT:
-      digitalWrite(stepPin, LOW);
-      digitalWrite(dirPin, LOW);
       break;
     default:
       break;
