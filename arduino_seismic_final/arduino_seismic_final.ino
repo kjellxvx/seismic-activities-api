@@ -140,6 +140,8 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
 
     case sIOtype_CONNECT:
       socketIO.send(sIOtype_CONNECT, "/");
+      digitalWrite(stepPin, HIGH);
+      digitalWrite(dirPin, HIGH);
 
       break;
 
@@ -169,6 +171,11 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
           }
         }
       }
+      break;
+
+    case sIOtype_DISCONNECT:
+      digitalWrite(stepPin, LOW);
+      digitalWrite(dirPin, LOW);
       break;
     default:
       break;

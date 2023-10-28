@@ -30,7 +30,7 @@ const smoothingFactor = 0.2
 let currentDelay = initialDelay
 
 function subscribeToStation (stationId) {
-  console.log('subscribed to station: ' + stationId)
+  console.log('Subscribed to station: ' + stationId)
   stationSocket = clientIo('https://orfeus-eu.org', {
     path: '/socket.io',
     transports: ['websocket', 'polling']
@@ -200,9 +200,7 @@ serverIo.on('connection', socket => {
   })
 
   socket.on('updateServer', data => {
-    console.log(data)
     if (data.active) {
-      console.log(data)
       savedData.active = true
       savedData.station = data.station
       savedData.threshold = data.threshold
@@ -211,9 +209,11 @@ serverIo.on('connection', socket => {
       subscribeToStation(data.station)
     } else {
       if (stationSocket) {
+        socket.disconnect();
         reset()
         stationSocket.close()
         savedData.active = false
+        console.log('Connection to esp closed')
         console.log('Connection to orfeus-eu.org server closed')
       }
     }
