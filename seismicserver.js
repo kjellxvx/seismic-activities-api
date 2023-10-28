@@ -209,7 +209,6 @@ serverIo.on('connection', socket => {
       subscribeToStation(data.station)
     } else {
       if (stationSocket) {
-        socket.disconnect();
         reset()
         stationSocket.close()
         savedData.active = false
