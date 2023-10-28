@@ -30,7 +30,7 @@ button {
   height: 100%;
 }
 
-.dataContainer {
+.data-container {
   display: flex;
   justify-content: center;
   padding: 5em 0 0 0;
@@ -43,4 +43,11 @@ button {
 .stat {
   text-align: center;
   padding: 1em;
+}
+
+.waiting-container {
+  display: flex;
+  justify-content: center;
+  gap: 0.5em;
+  padding: 5em 0 0 0;
 }

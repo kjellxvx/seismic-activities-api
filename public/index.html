@@ -17,7 +17,15 @@
     <div class="canvas-container">
       <canvas id="live-chart" height="200"></canvas>
     </div>
-    <div class="dataContainer">
+
+    <div class="waiting-container" id="loadingContainer">
+      <p>Waiting for enough data</p>
+      <p id="dataAmount"></p>
+      <p>/</p>
+      <p id="dataGoal"></p>
+    </div>
+
+    <div class="data-container" id="dataContainer">
       <div class="statsContainer">
         <div class="stat">
           <p>Current Value</p>
@@ -51,6 +59,11 @@
       <div>
         <p>Step Size</p>
         <input type="number" name="" id="stepsInput" />
+      </div>
+
+      <div>
+        <p>Data Length</p>
+        <input type="number" name="" id="dataLength" />
       </div>
     </div>
 

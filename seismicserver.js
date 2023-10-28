@@ -19,10 +19,10 @@ const savedData = {
   active: false,
   station: 'Choose station and press submit to see data',
   threshold: 2000,
-  stepSize: 5
+  stepSize: 5,
+  dataLength: 5000
 }
 
-const desiredLength = 2000
 const initialDelay = 40
 const feedbackFactor = 0.03
 const smoothingFactor = 0.2
@@ -41,12 +41,29 @@ function subscribeToStation (stationId) {
     stationSocket.emit('subscribe', stationId)
   })
 
+  let previousValue
+
   stationSocket.on('record', async function (data) {
     const values = data.data
-    globalData.push(...values)
-    console.log(globalData.length + ' / ' + desiredLength)
+    // Loop through the data points
+    for (let i = 0; i < values.length; i++) {
+      // Check if previousValue has been defined
+      if (previousValue !== undefined) {
+        // Calculate the difference between the current and previous data points
+        const diff = Math.abs(values[i] - previousValue)
+        // Check if the difference meets the threshold criteria
+        if (diff > savedData.threshold) {
+          // Add the value to the globalData array
+          globalData.push(values[i])
+        }
+      }
+      // Update previousValue for the next iteration
+      previousValue = values[i]
+    }
+    console.log(globalData.length + ' / ' + savedData.dataLength)
+    serverIo.emit('info', globalData.length)
 
-    if (globalData.length >= desiredLength && !isLogging) {
+    if (globalData.length >= savedData.dataLength && !isLogging) {
       isLogging = true
       startLogging()
     }
@@ -77,7 +94,7 @@ function calculateStats () {
 // Function to adjust the delay based on globalData length
 function adjustDelay () {
   const currentLength = globalData.length
-  const delta = desiredLength - currentLength
+  const delta = savedData.dataLength - currentLength
 
   // Calculate a new delay based on the feedback mechanism
   const newDelay = initialDelay + delta * feedbackFactor
@@ -102,40 +119,55 @@ function startLogging () {
   intervalId = setInterval(logDataContinuously, currentDelay)
 }
 
-let previousValue = null
-
 function logDataContinuously () {
   if (globalData.length > 0) {
-    const currentValue = globalData.shift() // Remove and get the first value
-
-    if (previousValue !== null) {
-      const diff = Math.abs(currentValue - previousValue)
-
-      if (diff > savedData.threshold) {
-        console.log('Data: ', currentValue)
-        // Calculate and log the highest, lowest, and middle values
-        const stats = calculateStats()
-        // console.log("Highest value:", stats.highest);
-        // console.log("Lowest value:", stats.lowest);
-        // console.log("Middle value:", stats.average);
-        const data = {
-          currentValue: currentValue,
-          maxValue: stats.highest,
-          minValue: stats.lowest,
-          averageValue: stats.average,
-          stepSize: savedData.stepSize
-        }
-        serverIo.emit('data', data)
-      }
+    const currentValue = globalData.shift()
+    const stats = calculateStats()
+    // console.log("Highest value:", stats.highest);
+    // console.log("Lowest value:", stats.lowest);
+    // console.log("Middle value:", stats.average);
+    const data = {
+      currentValue: currentValue,
+      maxValue: stats.highest,
+      minValue: stats.lowest,
+      averageValue: stats.average,
+      stepSize: savedData.stepSize,
+      dataLength: savedData.dataLength
     }
+    console.log('Data:', currentValue)
+    serverIo.emit('data', data)
 
-    previousValue = currentValue
+    // const currentValue = globalData.shift() // Remove and get the first value
+
+    // if (previousValue !== null) {
+    //   const diff = Math.abs(currentValue - previousValue)
+
+    //   if (diff > savedData.threshold) {
+    //     console.log('Data: ', currentValue)
+    //     // Calculate and log the highest, lowest, and middle values
+    //     const stats = calculateStats()
+    //     // console.log("Highest value:", stats.highest);
+    //     // console.log("Lowest value:", stats.lowest);
+    //     // console.log("Middle value:", stats.average);
+    //     const data = {
+    //       currentValue: currentValue,
+    //       maxValue: stats.highest,
+    //       minValue: stats.lowest,
+    //       averageValue: stats.average,
+    //       stepSize: savedData.stepSize,
+    //       dataLength: savedData.dataLength
+    //     }
+    //     serverIo.emit('data', data)
+    //   }
+    // }
+
+    // previousValue = currentValue
   }
 }
 
 function reset () {
-  globalData.length = 0;
-  isLogging = false;
+  globalData.length = 0
+  isLogging = false
 }
 
 // function logDataContinuously() {
@@ -175,6 +207,7 @@ serverIo.on('connection', socket => {
       savedData.station = data.station
       savedData.threshold = data.threshold
       savedData.stepSize = data.stepSize
+      savedData.dataLength = data.dataLength
       subscribeToStation(data.station)
     } else {
       if (stationSocket) {
