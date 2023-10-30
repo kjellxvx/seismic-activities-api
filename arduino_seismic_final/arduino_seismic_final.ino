@@ -20,6 +20,7 @@ const char* password = "obsunjemoes";
 
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiMulti.h>
+#include <TimeLib.h>
 
 #include <ArduinoJson.h>
 
@@ -189,15 +190,21 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
               int maxValue = data["maxValue"];
               int minValue = data["minValue"];
               int stepSize = data["stepSize"];
-              int timeStamp = data["timeStamp"];
+              unsigned long timeStamp = data["timeStamp"];
               int motorValue = map(currentValue, minValue, maxValue, -stepSize, stepSize);
 
-              unsigned long currentTimestamp = millis();
-              if (timeStamp == = currentTime of the Arduino) {
+
+              time_t currentTimestamp = time(NULL);
+
+              Serial.print(timeStamp);
+              Serial.print(" / ");
+              Serial.println(currentTimestamp);
+
+              if (timeStamp == currentTimestamp) {
                 Serial.println(currentValue);
                 moveMotor(motorValue);
               } else {
-                break
+                break;
               }
             }
           }
