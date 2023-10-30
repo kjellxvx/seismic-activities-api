@@ -135,8 +135,8 @@ function logDataContinuously () {
       dataLength: savedData.dataLength,
       timeStamp: new Date().getTime()
     }
-    console.log(data.timeStamp)
-    console.log('Data:', currentValue)
+    // console.log(data.timeStamp)
+    // console.log('Data:', currentValue)
     serverIo.emit('data', data)
 
     // const currentValue = globalData.shift() // Remove and get the first value
