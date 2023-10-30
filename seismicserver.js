@@ -18,9 +18,9 @@ let intervalId
 const savedData = {
   active: false,
   station: 'Choose station and press submit to see data',
-  threshold: 2000,
-  stepSize: 5,
-  dataLength: 5000
+  threshold: 1000,
+  stepSize: 15,
+  dataLength: 1000
 }
 
 const initialDelay = 50
