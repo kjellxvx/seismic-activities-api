@@ -103,35 +103,47 @@ socket.on('initApp', data => {
   liveChart.update()
 })
 
-function getStations () {
-  // Ajax request to get ODC stations
-  $.ajax({
-    dataType: 'text',
-    method: 'GET',
-    url: 'https://orfeus-eu.org/fdsnws/station/1/query?level=station&format=text',
-    success: function (json) {
-      markers = new Array()
+async function getStations () {
+  // Wrap the AJAX call in a Promise
+  const ajaxPromise = new Promise((resolve, reject) => {
+    $.ajax({
+      dataType: 'text',
+      method: 'GET',
+      url: 'https://orfeus-eu.org/fdsnws/station/1/query?level=station&format=text',
+      success: function (json) {
+        markers = new Array()
 
-      json = json.split('\n').slice(1, -1).map(rewriteJSON)
+        json = json.split('\n').slice(1, -1).map(rewriteJSON)
 
-      // Go over all stations
-      for (var i = 0; i < json.length; i++) {
-        var station = json[i]
+        for (var i = 0; i < json.length; i++) {
+          var station = json[i]
 
-        if (station.end && new Date(station.end) < Date.now()) {
-          // Skip stations that are not operational
-          continue
+          if (station.end && new Date(station.end) < Date.now()) {
+            // Skip stations that are not operational
+            continue
+          }
+
+          var option = document.createElement('option')
+          option.value = station.net + '.' + station.sta
+          option.text = station.net + '.' + station.sta
+          stationSelect.appendChild(option)
         }
-
-        // Create an option for the operational station
-        var option = document.createElement('option')
-        option.value = station.net + '.' + station.sta
-        option.text = station.net + '.' + station.sta
-        stationSelect.appendChild(option)
-        // console.log(station);
+        resolve()
+      },
+      error: function (error) {
+        reject(error)
       }
-    }
+    })
   })
+
+  try {
+    await ajaxPromise
+    var selectElement = document.getElementById('stationSelect')
+    var optionValue = 'NL.ROLD'
+    selectElement.value = optionValue
+  } catch (error) {
+    console.error('Error loading stations:', error)
+  }
 }
 
 function rewriteJSON (x) {
