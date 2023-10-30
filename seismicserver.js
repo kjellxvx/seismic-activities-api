@@ -23,7 +23,7 @@ const savedData = {
   dataLength: 5000
 }
 
-const initialDelay = 40
+const initialDelay = 100
 const feedbackFactor = 0.03
 const smoothingFactor = 0.2
 
