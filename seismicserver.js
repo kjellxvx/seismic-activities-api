@@ -112,6 +112,7 @@ function adjustDelay () {
 
 // Function to start logging data
 function startLogging () {
+  console.log("Enough Data, Start Logging")
   // Clear the existing interval (if any)
   clearInterval(intervalId)
 
@@ -136,7 +137,7 @@ function logDataContinuously () {
       timeStamp: new Date().getTime()
     }
     // console.log(data.timeStamp)
-    // console.log('Data:', currentValue)
+    console.log('Data:', currentValue)
     serverIo.emit('data', data)
 
     // const currentValue = globalData.shift() // Remove and get the first value
