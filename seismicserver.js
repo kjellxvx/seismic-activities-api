@@ -132,7 +132,8 @@ function logDataContinuously () {
       minValue: stats.lowest,
       averageValue: stats.average,
       stepSize: savedData.stepSize,
-      dataLength: savedData.dataLength
+      dataLength: savedData.dataLength,
+      timeStamp: new Date().getTime()
     }
     console.log('Data:', currentValue)
     serverIo.emit('data', data)

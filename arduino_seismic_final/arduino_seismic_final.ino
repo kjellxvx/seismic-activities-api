@@ -189,9 +189,16 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
               int maxValue = data["maxValue"];
               int minValue = data["minValue"];
               int stepSize = data["stepSize"];
+              int timeStamp = data["timeStamp"];
               int motorValue = map(currentValue, minValue, maxValue, -stepSize, stepSize);
-              Serial.println(currentValue);
-              moveMotor(motorValue);
+
+              unsigned long currentTimestamp = millis();
+              if (timeStamp == = currentTime of the Arduino) {
+                Serial.println(currentValue);
+                moveMotor(motorValue);
+              } else {
+                break
+              }
             }
           }
         }
