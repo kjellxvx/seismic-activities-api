@@ -1,3 +1,14 @@
+//############################################################################################
+//############################################################################################
+//############################################################################################
+
+const char* ssid = "obstlan";
+const char* password = "obsunjemoes";
+
+//############################################################################################
+//############################################################################################
+//############################################################################################
+
 #if !defined(ESP8266)
 #error This code is intended to run only on the ESP8266 boards ! Please check your Tools->Board setting.
 #endif
@@ -45,8 +56,7 @@ void setup() {
     WiFi.softAPdisconnect(true);
   }
 
-  WiFiMulti.addAP("FRITZ!WLAN Repeater 1750E", "00000000");
-  // WiFiMulti.addAP("unknown", "kjellwistoff");
+  WiFiMulti.addAP(ssid, password);
 
   //WiFi.disconnect();
   while (WiFiMulti.run() != WL_CONNECTED) {
@@ -74,13 +84,6 @@ void setup() {
   // setReconnectInterval to 10s, new from v2.5.1 to avoid flooding server. Default is 0.5s
   socketIO.setReconnectInterval(10000);
 
-  // socketIO.setExtraHeaders("Authorization: 1234567890");
-
-  // server address, port and URL
-  // void begin(IPAddress host, uint16_t port, String url = "/socket.io/?EIO=4", String protocol = "arduino");
-  // To use default EIO=4 fron v2.5.1
-  // socketIO.begin(serverIP, serverPort);
-
   // event handler
   socketIO.onEvent(socketIOEvent);
 }
@@ -92,7 +95,7 @@ void loop() {
 
   uint64_t now = millis();
 
-  if (now - messageTimestamp > 30000) {
+  if (now - messageTimestamp > 500) {
     messageTimestamp = now;
 
     // creat JSON message for Socket.IO (event)
@@ -100,7 +103,6 @@ void loop() {
     JsonArray array = doc.to<JsonArray>();
 
     // add evnet name
-    // Hint: socket.on('event_name', ....
     array.add("event_name");
 
     // add payload (parameters) for the event
@@ -113,9 +115,6 @@ void loop() {
 
     // Send event
     socketIO.sendEVENT(output);
-
-    // Print JSON for debugging
-    // Serial.println(output);
   }
 }
 
@@ -140,16 +139,11 @@ void moveMotor(int number) {
 
 void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const size_t& length) {
   switch (type) {
-    case sIOtype_DISCONNECT:
-      // Serial.println("[IOc] Disconnected");
-      break;
 
     case sIOtype_CONNECT:
-      // Serial.print("[IOc] Connected to url: ");
-      // Serial.println((char*) payload);
-
-      // join default namespace (no auto join in Socket.IO V3)
       socketIO.send(sIOtype_CONNECT, "/");
+      digitalWrite(stepPin, HIGH);
+      digitalWrite(dirPin, HIGH);
 
       break;
 
@@ -179,48 +173,6 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
           }
         }
       }
-      break;
-
-
-    case sIOtype_ACK:
-      // Serial.print("[IOc] Get ack: ");
-      // Serial.println(length);
-
-      hexdump(payload, length);
-      break;
-
-    case sIOtype_ERROR:
-      // Serial.print("[IOc] Get error: ");
-      // Serial.println(length);
-
-      hexdump(payload, length);
-      break;
-
-    case sIOtype_BINARY_EVENT:
-      // Serial.print("[IOc] Get binary: ");
-      // Serial.println(length);
-
-      hexdump(payload, length);
-      break;
-
-    case sIOtype_BINARY_ACK:
-      // Serial.print("[IOc] Get binary ack: ");
-      // Serial.println(length);
-
-      hexdump(payload, length);
-      break;
-
-    case sIOtype_PING:
-      // Serial.println("[IOc] Get PING");
-
-      break;
-
-    case sIOtype_PONG:
-      // Serial.println("[IOc] Get PONG");
-
-      break;
-
-    default:
       break;
   }
 }

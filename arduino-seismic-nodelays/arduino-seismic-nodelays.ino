@@ -118,25 +118,6 @@ void loop() {
 }
 
 
-void moveMotor(int number) {
-  Serial.println(number);
-
-  if (number > 0) {
-    digitalWrite(dirPin, HIGH);
-  } else {
-    digitalWrite(dirPin, LOW);
-  }
-
-  int posNumber = abs(number);
-
-  for (int x = 0; x < posNumber; x++) {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(1000);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(1000);
-  }
-}
-
 // void moveMotor(int number) {
 //   Serial.println(number);
 
@@ -148,18 +129,37 @@ void moveMotor(int number) {
 
 //   int posNumber = abs(number);
 
-//   unsigned long previousMillis = 0;     // Variable to store the last time the stepPin was toggled
-//   const unsigned long interval = 1000;  // Time in microseconds between stepPin toggles
-
 //   for (int x = 0; x < posNumber; x++) {
-//     unsigned long currentMillis = micros();  // Get the current time in microseconds
-
-//     if (currentMillis - previousMillis >= interval) {
-//       digitalWrite(stepPin, !digitalRead(stepPin));  // Toggle the stepPin
-//       previousMillis = currentMillis;                // Save the last time the stepPin was toggled
-//     }
+//     digitalWrite(stepPin, HIGH);
+//     delayMicroseconds(1000);
+//     digitalWrite(stepPin, LOW);
+//     delayMicroseconds(1000);
 //   }
 // }
+
+void moveMotor(int number) {
+  Serial.println(number);
+
+  if (number > 0) {
+    digitalWrite(dirPin, HIGH);
+  } else {
+    digitalWrite(dirPin, LOW);
+  }
+
+  int posNumber = abs(number);
+
+  unsigned long previousMillis = 0;     // Variable to store the last time the stepPin was toggled
+  const unsigned long interval = 1000;  // Time in microseconds between stepPin toggles
+
+  for (int x = 0; x < posNumber; x++) {
+    unsigned long currentMillis = micros();  // Get the current time in microseconds
+
+    if (currentMillis - previousMillis >= interval) {
+      digitalWrite(stepPin, !digitalRead(stepPin));  // Toggle the stepPin
+      previousMillis = currentMillis;                // Save the last time the stepPin was toggled
+    }
+  }
+}
 
 void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const size_t& length) {
   switch (type) {
@@ -190,17 +190,22 @@ void socketIOEvent(const socketIOmessageType_t& type, uint8_t* payload, const si
               int maxValue = data["maxValue"];
               int minValue = data["minValue"];
               int stepSize = data["stepSize"];
-              unsigned long timeStamp = data["timeStamp"];
+              int dataLength = data["dataLength"];
+
+              String timeStampStr = data["timeStamp"].as<String>();
+              unsigned long long timeStamp13 = strtoull(timeStampStr.c_str(), NULL, 10);
+              unsigned long timeStamp10 = static_cast<unsigned long>(timeStamp13 / 1000);
+
               int motorValue = map(currentValue, minValue, maxValue, -stepSize, stepSize);
 
 
               time_t currentTimestamp = time(NULL);
 
-              Serial.print(timeStamp);
+              Serial.print(timeStamp10);
               Serial.print(" / ");
               Serial.println(currentTimestamp);
 
-              if (timeStamp == currentTimestamp) {
+              if (timeStamp10 == currentTimestamp) {
                 Serial.println(currentValue);
                 moveMotor(motorValue);
               } else {
